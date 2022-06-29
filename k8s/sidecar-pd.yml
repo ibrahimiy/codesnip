@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webserver
+spec:
+  containers:
+  - image: ubuntu:latest
+    command: ["/bin/sh"]
+    args: ["-c","while true; do cat /var/log/nginx/access.log /var/log/nginx/error.log; sleep 30; done"]
+    name: sidecar-container
+    volumeMounts:
+    - name: shared-logs
+      mountPath: /var/log/nginx
+  - image: nginx:latest
+    name: nginx-container
+    volumeMounts:
+    - name: shared-logs
+      mountPath: /var/log/nginx
+  volumes:
+  - name: shared-logs
+    emptyDir: {}
