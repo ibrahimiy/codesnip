@@ -1,0 +1,69 @@
+- name: unarchive play app1
+  hosts: stapp01
+  tasks:
+  - name: Create Directory
+    ansible.builtin.file:
+      path: /opt/data/
+      state: directory 
+      mode: '0777'
+      group: 'tony'
+      owner: 'tony'
+    register: result
+    become: yes
+    
+
+  - name: Extract files
+    ansible.builtin.unarchive:
+      src: /usr/src/data/devops.zip
+      dest: /opt/data/
+      group: 'tony'
+      owner: 'tony'
+      mode: '0777'
+    when: result is succeeded
+    become: yes
+
+- name: unarchive play app2
+  hosts: stapp02
+  tasks:
+  - name: Create Directory
+    ansible.builtin.file:
+      path: /opt/data/
+      state: directory 
+      mode: '0777'
+      group: 'steve'
+      owner: 'steve'
+    register: result
+    become: yes
+
+  - name: Extract files
+    ansible.builtin.unarchive:
+      src: /usr/src/data/devops.zip
+      dest: /opt/data/
+      group: 'steve'
+      owner: 'steve'
+      mode: '0777'
+    when: result is succeeded
+    become: yes
+
+- name: unarchive play app3
+  hosts: stapp03
+  tasks:
+  - name: Create Directory
+    ansible.builtin.file:
+      path: /opt/data/
+      state: directory 
+      mode: '0777'
+      group: 'banner'
+      owner: 'banner'
+    register: result
+    become: yes
+
+  - name: Extract files
+    ansible.builtin.unarchive:
+      src: /usr/src/data/devops.zip
+      dest: /opt/data/
+      group: 'banner'
+      owner: 'banner'
+      mode: '0777'
+    when: result is succeeded
+    become: yes
