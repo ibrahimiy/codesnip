@@ -1,0 +1,43 @@
+- name: apache and php
+  hosts: stapp02
+  tasks:
+    - name: install http
+      ansible.builtin.package:
+        name: httpd
+        state: present
+      become: yes
+      register: result
+    - name: install php
+      ansible.builtin.package:
+        name: php
+        state: present
+      become: yes
+    - name: Replace line in file examples
+      become: yes
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: (^DocumentRoot\s)(.*)$
+        replace: \1/var/www/html/myroot
+        backup: yes
+      when: result is succeeded
+    - name: Create Destination Directory
+      ansible.builtin.file:
+        state: directory
+        path: /var/www/html/myroot
+      become: yes
+      register: createdir
+    - name: Copy file with owner and permissions
+      ansible.builtin.copy:
+        src: ~/playbooks/templates/phpinfo.php.j2
+        dest: /var/www/html/myroot/phpinfo.php
+        owner: apache
+        group: apache
+      when: createdir is succeeded
+      become: yes
+    - name: start httpd
+      ansible.builtin.service:
+        name: httpd
+        enabled: yes
+        state: started
+      when: result is succeeded
+      become: yes
