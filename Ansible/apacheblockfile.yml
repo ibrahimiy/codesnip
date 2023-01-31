@@ -1,0 +1,35 @@
+- name: apache
+  hosts: all
+  tasks:
+    - name: install http
+      ansible.builtin.package:
+        name: httpd
+        state: present
+      become: yes
+      register: result
+    - name: start httpd
+      ansible.builtin.service:
+        name: httpd
+        enabled: yes
+        state: started
+      when: result is succeeded
+      become: yes
+    - name: Create the index.html file
+      ansible.builtin.file:
+        path: /var/www/html/index.html
+        state: file
+        owner: apache
+        group: apache
+        mode: '0777'
+      when: result is succeeded
+      register: createfile
+      become: yes
+    - name: Add content to the index.html
+      ansible.builtin.blockinfile:
+        path: /var/www/html/index.html
+        block: |
+          Welcome to XfusionCorp!
+          This is Nautilus sample file, created using Ansible!
+          Please do not modify this file manually!
+      when: createfile is succeeded
+      become: yes
